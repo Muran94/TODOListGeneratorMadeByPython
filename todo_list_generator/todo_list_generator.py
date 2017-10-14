@@ -1,12 +1,10 @@
 import re
+from pycolor import PyColor
 
 class TodoListGenerator:
-    todo_list = []
-
     def __init__(self):
         self.todo_list = []
         self.start_time = self.__get_start_time()
-        self.end_time = self.start_time
 
     def create_todo_list(self):
         while True:
@@ -15,29 +13,42 @@ class TodoListGenerator:
             self.start_time = self.end_time
 
     def __add_todo(self):
-        self.end_time = self.__get_end_time(int(input("TODOにかかる時間(分) : ")))
+        self.end_time = self.__get_end_time(self.__get_process_time())
         todo_name = self.__get_todo_name()
-        self.todo_list.append(" - [ ] {0} ~ {1} | {2}".format(self.__format_time(self.start_time), self.__format_time(self.end_time), todo_name))
+        if todo_name == "休憩":
+            self.todo_list.append("\n{2} ({0} ~ {1})\n".format(self.__format_time(self.start_time), self.__format_time(self.end_time), todo_name))
+        else:
+            self.todo_list.append(" - [ ] {0} ~ {1} | {2}".format(self.__format_time(self.start_time), self.__format_time(self.end_time), todo_name))
 
     def __return_todo_list(self):
+        print("-" * 100)
         for todo in self.todo_list:
             print(todo)
+        print("-" * 100)
 
     def __get_todo_name(self):
         while True:
-            todo_name = input("TODO名 : ")
+            todo_name = input(PyColor.CYAN + "TODO名 : " + PyColor.END)
             if todo_name: # 空文字でなければ
                 return todo_name
             else:
-                print("TODO名を入力してください。")
+                print(PyColor.RED + "TODO名を入力してください。" + PyColor.END)
+
+    def __get_process_time(self):
+        while True:
+            process_time = input(PyColor.CYAN + "TODOにかかる時間(分) : " + PyColor.END)
+            if re.match("^[0-9]{1,3}$", process_time):
+                return int(process_time)
+            else:
+                print(PyColor.RED + "整数値3桁までで入力してください。" + PyColor.END)
 
     def __get_start_time(self):
         while True:
-            start_time = input("開始時間(HHMM) : ")
+            start_time = input(PyColor.CYAN + "開始時間(HHMM) : " + PyColor.END)
             if re.match("^[0-9]{4}$", start_time):
                 return start_time
             else:
-                print("整数値4桁で入力してください。")
+                print(PyColor.RED + "整数値4桁で入力してください。" + PyColor.END)
 
     def __get_end_time(self, todo_process_minute):
         end_time = self.__calc_end_time(todo_process_minute)
